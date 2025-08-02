@@ -1,21 +1,23 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/auth/Login";
-import Dashboard from "./pages/admin/Dashboard"; // sample
+import Dashboard from "./pages/admin/Dashboard";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./routes/ProtectedRoute";
-import { Navigate } from "react-router-dom";
-
+import Home from "./pages/Home";
+import './App.css';
 const App = () => {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-           <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute allowedRoles={["admin", "student", "donor", "invigilator"]}>
+              <ProtectedRoute
+                allowedRoles={["admin", "invigilator"]}
+              >
                 <Dashboard />
               </ProtectedRoute>
             }
