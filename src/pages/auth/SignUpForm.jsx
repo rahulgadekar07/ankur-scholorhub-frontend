@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { TextField, Button, Alert, FormControl, InputLabel, Select, MenuItem, Typography } from "@mui/material";
+import React, { useState, useEffect, useCallback } from "react";
+import { TextField, Button, Alert, FormControl, InputLabel, Select, MenuItem, Typography, Box } from "@mui/material";
 
 const SignUpForm = ({ credentials, onChange, onSubmit, error, setError }) => {
   const [touched, setTouched] = useState({
@@ -10,27 +10,27 @@ const SignUpForm = ({ credentials, onChange, onSubmit, error, setError }) => {
     profile_image: false,
   });
   const [validationErrors, setValidationErrors] = useState({});
+  const [previewUrl, setPreviewUrl] = useState(null);
 
-  const validateField = (name, value) => {
+  const validateField = useCallback((name, value) => {
     const errors = {};
-    if (name === "full_name" && !value && touched.full_name) errors.full_name = "Full Name is required.";
-    if (name === "email" && !value && touched.email) errors.email = "Email is required.";
-    else if (name === "email" && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) && touched.email)
-      errors.email = "Invalid email format.";
-    if (name === "password" && !value && touched.password) errors.password = "Password is required.";
-    if (name === "role" && !value && touched.role) errors.role = "Role is required.";
-    if (name === "profile_image" && !value && touched.profile_image)
-      errors.profile_image = "Profile image is required.";
+    if (name === "full_name" && !value && touched[name]) errors[name] = "Full Name is required.";
+    if (name === "email" && !value && touched[name]) errors[name] = "Email is required.";
+    else if (name === "email" && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) && touched[name])
+      errors[name] = "Invalid email format.";
+    if (name === "password" && !value && touched[name]) errors[name] = "Password is required.";
+    if (name === "role" && !value && touched[name]) errors[name] = "Role is required.";
+    if (name === "profile_image" && !value && touched[name]) errors[name] = "Profile image is required.";
     return errors;
-  };
+  }, [touched]);
 
   const handleBlur = (e) => {
     const { name, value } = e.target;
-    setTouched({ ...touched, [name]: true });
+    setTouched((prev) => ({ ...prev, [name]: true }));
     setValidationErrors((prev) => ({ ...prev, ...validateField(name, value) }));
   };
 
-  const handleChange = (e) => {
+  const debouncedHandleChange = useCallback((e) => {
     const { name, value, files } = e.target;
     onChange(e);
     if (name === "profile_image" && files && files[0]) {
@@ -39,10 +39,13 @@ const SignUpForm = ({ credentials, onChange, onSubmit, error, setError }) => {
         delete newErrors.profile_image;
         return newErrors;
       });
+      const file = files[0];
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
     } else {
       setValidationErrors((prev) => ({ ...prev, ...validateField(name, value) }));
     }
-  };
+  }, [onChange, validateField]);
 
   useEffect(() => {
     const allErrors = {};
@@ -50,7 +53,15 @@ const SignUpForm = ({ credentials, onChange, onSubmit, error, setError }) => {
       Object.assign(allErrors, validateField(name, value));
     }
     setValidationErrors(allErrors);
-  }, [credentials, touched]);
+  }, [credentials, validateField]);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -65,6 +76,33 @@ const SignUpForm = ({ credentials, onChange, onSubmit, error, setError }) => {
     onSubmit(e);
   };
 
+  const handleClear = () => {
+    const initialCredentials = {
+      full_name: "",
+      email: "",
+      password: "",
+      role: "student",
+      phone: "",
+      profile_image: null,
+      address: "",
+      dob: "",
+      gender: "",
+      bio: "",
+      organization: "",
+    };
+    onChange({ target: { name: "all", value: initialCredentials } });
+    setPreviewUrl(null);
+    setTouched({
+      full_name: false,
+      email: false,
+      password: false,
+      role: false,
+      profile_image: false,
+    });
+    setValidationErrors({});
+    setError("");
+  };
+
   return (
     <form onSubmit={handleSubmit}>
       <TextField
@@ -72,7 +110,7 @@ const SignUpForm = ({ credentials, onChange, onSubmit, error, setError }) => {
         label="Full Name"
         name="full_name"
         value={credentials.full_name}
-        onChange={handleChange}
+        onChange={debouncedHandleChange}
         onBlur={handleBlur}
         margin="normal"
         variant="outlined"
@@ -87,7 +125,7 @@ const SignUpForm = ({ credentials, onChange, onSubmit, error, setError }) => {
         label="Email"
         name="email"
         value={credentials.email}
-        onChange={handleChange}
+        onChange={debouncedHandleChange}
         onBlur={handleBlur}
         margin="normal"
         variant="outlined"
@@ -103,7 +141,7 @@ const SignUpForm = ({ credentials, onChange, onSubmit, error, setError }) => {
         name="password"
         type="password"
         value={credentials.password}
-        onChange={handleChange}
+        onChange={debouncedHandleChange}
         onBlur={handleBlur}
         margin="normal"
         variant="outlined"
@@ -111,6 +149,7 @@ const SignUpForm = ({ credentials, onChange, onSubmit, error, setError }) => {
         error={!!validationErrors.password}
         helperText={validationErrors.password || ""}
         FormHelperTextProps={{ style: { color: "red" } }}
+        inputProps={{ autoComplete: "current-password" }}
         sx={{ mb: 2 }}
       />
       <TextField
@@ -118,7 +157,7 @@ const SignUpForm = ({ credentials, onChange, onSubmit, error, setError }) => {
         label="Role"
         name="role"
         value={credentials.role}
-        onChange={handleChange}
+        onChange={debouncedHandleChange}
         onBlur={handleBlur}
         margin="normal"
         variant="outlined"
@@ -140,7 +179,7 @@ const SignUpForm = ({ credentials, onChange, onSubmit, error, setError }) => {
         label="Phone"
         name="phone"
         value={credentials.phone}
-        onChange={handleChange}
+        onChange={debouncedHandleChange}
         margin="normal"
         variant="outlined"
         sx={{ mb: 2 }}
@@ -155,21 +194,27 @@ const SignUpForm = ({ credentials, onChange, onSubmit, error, setError }) => {
         type="file"
         name="profile_image"
         accept="image/*"
-        onChange={handleChange}
+        onChange={debouncedHandleChange}
         onBlur={handleBlur}
-        style={{ display: "none" }} // Hide the default input
+        style={{ display: "none" }}
       />
       {validationErrors.profile_image && (
         <Typography color="error" sx={{ mb: 2 }}>
           {validationErrors.profile_image}
         </Typography>
       )}
+      {previewUrl && (
+        <div>
+          <Typography sx={{ mb: 1 }}>Preview:</Typography>
+          <img src={previewUrl} alt="Profile Preview" style={{ maxWidth: "100%", maxHeight: "200px", marginBottom: "16px" }} />
+        </div>
+      )}
       <TextField
         fullWidth
         label="Address"
         name="address"
         value={credentials.address}
-        onChange={handleChange}
+        onChange={debouncedHandleChange}
         margin="normal"
         variant="outlined"
         multiline
@@ -181,7 +226,7 @@ const SignUpForm = ({ credentials, onChange, onSubmit, error, setError }) => {
         label="Date of Birth"
         name="dob"
         value={credentials.dob}
-        onChange={handleChange}
+        onChange={debouncedHandleChange}
         margin="normal"
         variant="outlined"
         type="date"
@@ -194,7 +239,7 @@ const SignUpForm = ({ credentials, onChange, onSubmit, error, setError }) => {
           labelId="gender-label"
           name="gender"
           value={credentials.gender}
-          onChange={handleChange}
+          onChange={debouncedHandleChange}
           label="Gender"
         >
           <MenuItem value="">
@@ -210,7 +255,7 @@ const SignUpForm = ({ credentials, onChange, onSubmit, error, setError }) => {
         label="Bio"
         name="bio"
         value={credentials.bio}
-        onChange={handleChange}
+        onChange={debouncedHandleChange}
         margin="normal"
         variant="outlined"
         multiline
@@ -222,21 +267,32 @@ const SignUpForm = ({ credentials, onChange, onSubmit, error, setError }) => {
         label="Organization"
         name="organization"
         value={credentials.organization}
-        onChange={handleChange}
+        onChange={debouncedHandleChange}
         margin="normal"
         variant="outlined"
         sx={{ mb: 2 }}
       />
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-      <Button
-        type="submit"
-        fullWidth
-        variant="contained"
-        color="primary"
-        sx={{ mt: 2, py: 1.5, fontSize: "16px" }}
-      >
-        Sign Up
-      </Button>
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error.message || error}</Alert>}
+      <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          color="primary"
+          sx={{ py: 1.5, fontSize: "16px" }}
+        >
+          Sign Up
+        </Button>
+        <Button
+          fullWidth
+          variant="outlined"
+          color="secondary"
+          onClick={handleClear}
+          sx={{ py: 1.5, fontSize: "16px" }}
+        >
+          Clear
+        </Button>
+      </Box>
     </form>
   );
 };

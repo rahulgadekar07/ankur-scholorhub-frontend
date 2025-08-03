@@ -43,7 +43,10 @@ const AuthModal = ({ open, onClose }) => {
   };
 
   const handleSignUpChange = (e) => {
-    if (e.target.name === "profile_image") {
+    if (e.target.name === "all") {
+      // Reset all fields to initial state
+      setSignUpCredentials({ ...e.target.value }); // Spread the initial object
+    } else if (e.target.name === "profile_image") {
       setSignUpCredentials({ ...signUpCredentials, [e.target.name]: e.target.files[0] });
     } else {
       setSignUpCredentials({ ...signUpCredentials, [e.target.name]: e.target.value });
@@ -75,13 +78,12 @@ const AuthModal = ({ open, onClose }) => {
           formData.append(key, signUpCredentials[key]);
         }
       }
-      const { user, token } = await signUpUser(formData);
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("token", token);
-      await login({ email: signUpCredentials.email, password: signUpCredentials.password });
+      const response = await signUpUser(formData);
+      console.log("Sign-up response:", response);
       onClose();
     } catch (err) {
-      setError(err.message || "An error occurred during sign-up.");
+      const errorMessage = err.response?.data?.message || err.message || "An error occurred during sign-up.";
+      setError(errorMessage);
     }
   };
 
@@ -127,7 +129,7 @@ const AuthModal = ({ open, onClose }) => {
     },
   };
 
-  if (!open) return null; // Prevent rendering if not open to avoid issues
+  if (!open) return null;
 
   return (
     <Modal

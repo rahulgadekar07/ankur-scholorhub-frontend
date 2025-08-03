@@ -6,7 +6,7 @@ const SignInForm = ({ credentials, onChange, onSubmit, error }) => {
     <form onSubmit={onSubmit}>
       <TextField
         fullWidth
-        label="Email"D
+        label="Email"
         name="email"
         value={credentials.email}
         onChange={onChange}

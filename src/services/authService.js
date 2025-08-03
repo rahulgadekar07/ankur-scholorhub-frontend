@@ -1,18 +1,30 @@
 import axios from "axios";
 
-const BASE_URL = "https://ankur-scholorhub-backend-aehg.onrender.com/api/";
+// Take base URL from environment variable
+const baseUrl = process.env.REACT_APP_BASE_URL;
 
 export const loginUser = async ({ email, password }) => {
-  const response = await axios.post(`${BASE_URL}auth/login`, {
-    email,
-    password,
-  });
-  return response.data; // Assumes response.data is { user, token }
+  try {
+    const response = await axios.post(`${baseUrl}auth/login`, {
+      email,
+      password,
+    });
+    return response.data; // Assumes response.data is { user, token }
+  } catch (error) {
+    console.error("Login error:", error.response?.data || error.message);
+    throw error; // Rethrow to handle in calling function
+  }
 };
 
 export const signUpUser = async (formData) => {
-  const response = await axios.post(`${BASE_URL}auth/signup`, formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
-  return response.data; // Assumes response.data is { user, token }
+  try {
+    const response = await axios.post(`${baseUrl}auth/signup`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    console.log("Sign-up response:", response);
+    return response.data; // Return only data, assuming { user, token }
+  } catch (error) {
+    console.error("Sign-up error:", error.response?.data || error.message);
+    throw error.response?.data || { message: error.message }; // Throw error data or default message
+  }
 };
