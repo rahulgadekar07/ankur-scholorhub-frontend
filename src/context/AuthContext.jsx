@@ -62,6 +62,8 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setToken(null);
     localStorage.clear();
+    console.log("User logged out");
+    
   };
 
   return (

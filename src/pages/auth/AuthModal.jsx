@@ -7,6 +7,8 @@ import {
   Tab,
   Typography,
 } from "@mui/material";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import SignInForm from "./SignInForm";
 import SignUpForm from "./SignUpForm";
 import { signUpUser } from "../../services/authService";
@@ -44,8 +46,7 @@ const AuthModal = ({ open, onClose }) => {
 
   const handleSignUpChange = (e) => {
     if (e.target.name === "all") {
-      // Reset all fields to initial state
-      setSignUpCredentials({ ...e.target.value }); // Spread the initial object
+      setSignUpCredentials({ ...e.target.value });
     } else if (e.target.name === "profile_image") {
       setSignUpCredentials({ ...signUpCredentials, [e.target.name]: e.target.files[0] });
     } else {
@@ -59,12 +60,36 @@ const AuthModal = ({ open, onClose }) => {
     try {
       const success = await login(signInCredentials);
       if (success) {
-        onClose();
+        console.log("Showing success toast for sign-in");
+        toast.success("Signed in successfully!", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          toastId: "sign-in-success",
+        });
+        setTimeout(onClose, 1000); // Delay closing to show toast
       } else {
-        setError("Sign-in failed. Please check your credentials.");
+        const errorMessage = "Sign-in failed. Please check your credentials.";
+        setError(errorMessage);
+        console.log("Showing error toast for sign-in");
+        toast.error(errorMessage, {
+          position: "top-right",
+          autoClose: 5000,
+          toastId: "sign-in-error",
+        });
       }
     } catch (err) {
-      setError(err.message || "An error occurred during sign-in.");
+      const errorMessage = err.message || "An error occurred during sign-in.";
+      setError(errorMessage);
+      console.log("Showing error toast for sign-in", errorMessage);
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        toastId: "sign-in-error",
+      });
     }
   };
 
@@ -80,10 +105,26 @@ const AuthModal = ({ open, onClose }) => {
       }
       const response = await signUpUser(formData);
       console.log("Sign-up response:", response);
-      onClose();
+      console.log("Showing success toast for sign-up");
+      toast.success("Signed up successfully!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        toastId: "sign-up-success",
+      });
+      setTimeout(onClose, 2000); // Delay closing to show toast
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.message || "An error occurred during sign-up.";
       setError(errorMessage);
+      console.log("Showing error toast for sign-up", errorMessage);
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        toastId: "sign-up-error",
+      });
     }
   };
 
@@ -98,6 +139,7 @@ const AuthModal = ({ open, onClose }) => {
     p: 2,
     borderRadius: 8,
     outline: "none",
+    zIndex: 1300,
   };
 
   const contentStyle = {
@@ -168,6 +210,10 @@ const AuthModal = ({ open, onClose }) => {
               setError={setError}
             />
           )}
+          {/* Test button to trigger a toast
+          <button onClick={() => toast.success("Test Toast!", { toastId: "test-toast" })}>
+            Test Toast
+          </button> */}
         </Box>
       </Box>
     </Modal>

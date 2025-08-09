@@ -1,7 +1,14 @@
-import React from "react";
-import { TextField, Button, Alert } from "@mui/material";
+import React, { useState } from "react";
+import { TextField, Button, Alert, IconButton, InputAdornment } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const SignInForm = ({ credentials, onChange, onSubmit, error }) => {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   return (
     <form onSubmit={onSubmit}>
       <TextField
@@ -19,13 +26,26 @@ const SignInForm = ({ credentials, onChange, onSubmit, error }) => {
         fullWidth
         label="Password"
         name="password"
-        type="password"
+        type={showPassword ? "text" : "password"}
         value={credentials.password}
         onChange={onChange}
         margin="normal"
         variant="outlined"
         required
         sx={{ mb: 2 }}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={handleClickShowPassword}
+                edge="end"
+              >
+                {showPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
       />
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
       <Button
