@@ -6,31 +6,54 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
-    if (!storedUser) return null;
+    const expiresAt = localStorage.getItem("expiresAt");
+
+    if (!storedUser || !expiresAt) return null;
+
+    if (Date.now() > parseInt(expiresAt, 10)) {
+      localStorage.clear();
+      return null;
+    }
+
     try {
-      return storedUser ? JSON.parse(storedUser) : null;
-    } catch (error) {
-      console.error("Error parsing user from localStorage:", error);
+      return JSON.parse(storedUser);
+    } catch {
       localStorage.removeItem("user");
       return null;
     }
   });
+
   const [token, setToken] = useState(() => {
     const storedToken = localStorage.getItem("token");
-    return storedToken || null;
+    const expiresAt = localStorage.getItem("expiresAt");
+
+    if (!storedToken || !expiresAt) return null;
+
+    if (Date.now() > parseInt(expiresAt, 10)) {
+      localStorage.clear();
+      return null;
+    }
+
+    return storedToken;
   });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const login = async (credentials) => {
     setLoading(true);
-    setError(null); // Clear previous error
+    setError(null);
     try {
       const { user, token } = await loginUser(credentials);
+
+      const expiryTime = Date.now() + 60 * 60 * 1000; // 1 hour from now
+
       setUser(user);
       setToken(token);
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("token", token);
+      localStorage.setItem("expiresAt", expiryTime.toString()); // <-- fix
+
       return true;
     } catch (err) {
       setError(err.message || "Login failed");
@@ -45,10 +68,14 @@ export const AuthProvider = ({ children }) => {
     setError(null); // Clear previous error
     try {
       const { user, token } = await signUpUser(credentials);
+      const expiryTime = Date.now() + 60 * 60 * 1000; // 1 hour from now
+
       setUser(user);
       setToken(token);
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("token", token);
+      localStorage.setItem("expiresAt", expiryTime.toString()); // <-- fix
+
       return true;
     } catch (err) {
       setError(err.message || "Sign-up failed");
@@ -63,11 +90,12 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     localStorage.clear();
     console.log("User logged out");
-    
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, signup, logout, loading, error }}>
+    <AuthContext.Provider
+      value={{ user, token, login, signup, logout, loading, error }}
+    >
       {children}
     </AuthContext.Provider>
   );

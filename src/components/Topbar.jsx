@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope, faPen } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "../context/AuthContext";
 import AuthModal from "../pages/auth/AuthModal";
 import { ToastContainer, toast } from "react-toastify";
@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 const Topbar = () => {
   const { user, logout } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -29,16 +30,7 @@ const Topbar = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      console.log("Logout successful, user should be null");
-      toast.success("Logged out successfully!", {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        toastId: "logout-success",
-      });
+      toast.success("Logged out successfully!", { autoClose: 2000 });
       navigate("/");
       setDropdownOpen(false);
     } catch (error) {
@@ -50,42 +42,6 @@ const Topbar = () => {
     console.log("User in Topbar:", user);
     console.log("Encoded Profile Image in Topbar:", encodedFilePath);
   }, [encodedFilePath, user]);
-
-  const openImageInPopup = () => {
-    if (userProfileImage) {
-      const modal = document.createElement("div");
-      modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-      `;
-
-      const img = document.createElement("img");
-      img.src = userProfileImage;
-      img.style.cssText = `
-        max-width: 90%;
-        max-height: 90%;
-        object-fit: contain;
-      `;
-
-      modal.addEventListener("click", () => modal.remove());
-      modal.appendChild(img);
-      document.body.appendChild(modal);
-    } else {
-      alert("No profile image available.");
-    }
-  };
-
-  const openProfilePage = () => {
-    navigate("/profile");
-  };
 
   return (
     <div className="max-h-30vh">
@@ -103,24 +59,22 @@ const Topbar = () => {
                   src={encodedFilePath}
                   alt="Profile"
                   className="w-8 h-8 rounded-full inline-block mr-2 cursor-pointer"
-                  onClick={openImageInPopup}
+                  onClick={() => setProfileModalOpen(true)}
                 />
               </span>
               <button
                 type="button"
-                className="text-white bg-transparent border-none p-0 m-0 underline cursor-pointer"
+                className="text-white bg-transparent underline cursor-pointer"
                 onClick={toggleDropdown}
-                aria-haspopup="true"
-                aria-expanded={dropdownOpen}
               >
                 {user.full_name}
               </button>
               {dropdownOpen && (
-                <div className="dropdown-content absolute right-0 mt-2 w-48 bg-white text-blue-800 rounded shadow-lg z-10">
+                <div className="absolute right-0 mt-2 w-48 bg-white text-blue-800 rounded shadow-lg z-10">
                   <button
                     type="button"
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                    onClick={openProfilePage}
+                    onClick={() => navigate("/profile")}
                   >
                     Profile
                   </button>
@@ -138,7 +92,7 @@ const Topbar = () => {
             <span className="ml-2">
               <button
                 type="button"
-                className="text-white bg-transparent border-none p-0 m-0 underline cursor-pointer"
+                className="text-white underline cursor-pointer"
                 onClick={handleOpen}
               >
                 Login
@@ -180,17 +134,37 @@ const Topbar = () => {
         </p>
       </div>
 
+      {/* Profile Picture Modal */}
+      {profileModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 relative max-w-sm w-full text-center">
+            <div className="relative inline-block">
+              <img
+                src={encodedFilePath}
+                alt="Profile Large"
+                className="w-40 h-40 rounded-full object-cover mx-auto"
+              />
+              <button
+                className="absolute bottom-2 right-2 bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700"
+                onClick={() => console.log("Edit profile clicked")}
+              >
+                <FontAwesomeIcon icon={faPen} />
+              </button>
+            </div>
+            <p className="mt-4 font-semibold">{user.full_name}</p>
+            <button
+              onClick={() => setProfileModalOpen(false)}
+              className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Auth Modal */}
       <AuthModal open={modalOpen} onClose={handleClose} />
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        closeOnClick
-        pauseOnHover
-        draggable
-        style={{ zIndex: 9999 }}
-      />
+      <ToastContainer style={{ zIndex: 9999 }} />
     </div>
   );
 };

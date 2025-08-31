@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 function Profile() {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user') || '{}'));
@@ -104,6 +105,15 @@ function Profile() {
         setUser(updatedUser);
         localStorage.setItem('user', JSON.stringify(updatedUser));
         setSuccess('Profile updated successfully!');
+          toast.success("Profile updated successfully!", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          toastId: "sign-in-success",
+        });
         setTimeout(() => setSuccess(null), 3000);
         setLoading(false);
         if (selectedFile) {
