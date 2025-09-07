@@ -1,5 +1,6 @@
 import { createContext, useState, useContext } from "react";
 import { loginUser, signUpUser } from "../services/authService";
+import axios from "axios";
 
 const AuthContext = createContext();
 
@@ -9,7 +10,6 @@ export const AuthProvider = ({ children }) => {
     const expiresAt = localStorage.getItem("expiresAt");
 
     if (!storedUser || !expiresAt) return null;
-
     if (Date.now() > parseInt(expiresAt, 10)) {
       localStorage.clear();
       return null;
@@ -28,12 +28,10 @@ export const AuthProvider = ({ children }) => {
     const expiresAt = localStorage.getItem("expiresAt");
 
     if (!storedToken || !expiresAt) return null;
-
     if (Date.now() > parseInt(expiresAt, 10)) {
       localStorage.clear();
       return null;
     }
-
     return storedToken;
   });
 
@@ -45,14 +43,13 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     try {
       const { user, token } = await loginUser(credentials);
-
-      const expiryTime = Date.now() + 60 * 60 * 1000; // 1 hour from now
+      const expiryTime = Date.now() + 60 * 60 * 1000; // 1 hour
 
       setUser(user);
       setToken(token);
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("token", token);
-      localStorage.setItem("expiresAt", expiryTime.toString()); // <-- fix
+      localStorage.setItem("expiresAt", expiryTime.toString());
 
       return true;
     } catch (err) {
@@ -65,16 +62,16 @@ export const AuthProvider = ({ children }) => {
 
   const signup = async (credentials) => {
     setLoading(true);
-    setError(null); // Clear previous error
+    setError(null);
     try {
       const { user, token } = await signUpUser(credentials);
-      const expiryTime = Date.now() + 60 * 60 * 1000; // 1 hour from now
+      const expiryTime = Date.now() + 60 * 60 * 1000; // 1 hour
 
       setUser(user);
       setToken(token);
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("token", token);
-      localStorage.setItem("expiresAt", expiryTime.toString()); // <-- fix
+      localStorage.setItem("expiresAt", expiryTime.toString());
 
       return true;
     } catch (err) {
@@ -92,9 +89,38 @@ export const AuthProvider = ({ children }) => {
     console.log("User logged out");
   };
 
+  // 🔹 NEW: fetch latest user from backend
+  const fetchUser = async () => {
+    if (!token) return;
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_BASE_URL}auth/me`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (response.data.user) {
+        setUser(response.data.user);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+      }
+    } catch (err) {
+      console.error("Failed to fetch user:", err);
+    }
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, token, login, signup, logout, loading, error }}
+      value={{
+        user,
+        token,
+        setUser,
+        login,
+        signup,
+        logout,
+        fetchUser, // expose
+        loading,
+        error,
+      }}
     >
       {children}
     </AuthContext.Provider>

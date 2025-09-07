@@ -209,7 +209,7 @@ function Profile() {
               className="w-full p-2 border border-gray-300 rounded"
             />
           </div>
-          <div className="col-span-2">
+          {/* <div className="col-span-2">
             <label className="block text-gray-700 font-medium mb-1">
               Profile Image:
             </label>
@@ -261,7 +261,7 @@ function Profile() {
                 onError={handleImageError}
               />
             )}
-          </div>
+          </div> */}
           <div>
             <label className="block text-gray-700 font-medium mb-1">
               Gender:
