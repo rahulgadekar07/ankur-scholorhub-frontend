@@ -1,6 +1,7 @@
 // pages/admin/AdminPage.js
 import React from "react";
 import CustomTable from "../../components/CustomTable";
+import AdminHeader from "./AdminHeader";
 
 const AdminPage = () => {
   // Demo columns
@@ -31,9 +32,8 @@ const AdminPage = () => {
   };
 
   return (
-    <div style={{ padding: "1rem" }}>
-      <h1>Admin Dashboard</h1>
-      <p>Welcome, Admin! 🎉</p>
+    <div>
+     <AdminHeader/>
 
       <CustomTable
         columns={columns}
