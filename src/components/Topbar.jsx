@@ -9,13 +9,16 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Topbar = () => {
-  const { user, logout, setUser,fetchUser } = useAuth(); // ✅ make sure setUser exists in AuthContext
+  const { user, logout, setUser, fetchUser } = useAuth(); // ✅ make sure setUser exists in AuthContext
   const [modalOpen, setModalOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
-  const baseUrl = (process.env.REACT_APP_BASE_URL_IMG || "").replace(/\/+$/, "");
+  const baseUrl = (process.env.REACT_APP_BASE_URL_IMG || "").replace(
+    /\/+$/,
+    ""
+  );
   const defaultImage = "/default-profile.png";
   const userProfileImage = user?.profile_image
     ? `${baseUrl}/${user.profile_image.replace(/^\/+/, "")}`
@@ -25,8 +28,8 @@ const Topbar = () => {
     : defaultImage;
 
   const fileInputRef = useRef(null);
-  const dropdownRef = useRef(null); 
-useEffect(() => {
+  const dropdownRef = useRef(null);
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
@@ -66,39 +69,38 @@ useEffect(() => {
   };
 
   // Handle file upload
-const handleFileChange = async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
 
-  try {
-    const formData = new FormData();
-    formData.append("profile_image", file);
+    try {
+      const formData = new FormData();
+      formData.append("profile_image", file);
 
-    const token = localStorage.getItem("token");
-    const response = await axios.put(
-      `${process.env.REACT_APP_BASE_URL}auth/update-profile-picture/${user.id}`,
-      formData,
-      {
-        headers: { Authorization: `Bearer ${token}` },
+      const token = localStorage.getItem("token");
+      const response = await axios.put(
+        `${process.env.REACT_APP_BASE_URL}auth/update-profile-picture/${user.id}`,
+        formData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.data.user) {
+        setUser(response.data.user); // update full user object
+        toast.success(response.data.message);
       }
-    );
-
-    if (response.data.user) {
-      setUser(response.data.user); // update full user object
-      toast.success(response.data.message);
+    } catch (error) {
+      console.error("Error updating profile picture:", error);
+      toast.error("Failed to update profile picture.");
     }
-  } catch (error) {
-    console.error("Error updating profile picture:", error);
-    toast.error("Failed to update profile picture.");
-  }
-};
-
-
+  };
 
   useEffect(() => {
-     fetchUser();
+    fetchUser();
     console.log("User in Topbar:", user);
     console.log("Encoded Profile Image in Topbar:", encodedFilePath);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -128,7 +130,10 @@ const handleFileChange = async (event) => {
                 {user.full_name}
               </button>
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white text-blue-800 rounded shadow-lg z-10" ref={dropdownRef}>
+                <div
+                  className="absolute right-0 mt-2 w-48 bg-white text-blue-800 rounded shadow-lg z-10"
+                  ref={dropdownRef}
+                >
                   <button
                     type="button"
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100"

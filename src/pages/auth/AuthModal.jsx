@@ -1,22 +1,18 @@
 import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import {
-  Modal,
-  Box,
-  Tabs,
-  Tab,
-  Typography,
-} from "@mui/material";
+import { Modal, Box, Tabs, Tab, Typography } from "@mui/material";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SignInForm from "./SignInForm";
 import SignUpForm from "./SignUpForm";
 import { signUpUser } from "../../services/authService";
+import { useNavigate } from "react-router-dom";
 
 const AuthModal = ({ open, onClose }) => {
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const [tabValue, setTabValue] = useState(0);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
   const [signInCredentials, setSignInCredentials] = useState({
     email: "",
     password: "",
@@ -41,26 +37,37 @@ const AuthModal = ({ open, onClose }) => {
   };
 
   const handleSignInChange = (e) => {
-    setSignInCredentials({ ...signInCredentials, [e.target.name]: e.target.value });
+    setSignInCredentials({
+      ...signInCredentials,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSignUpChange = (e) => {
     if (e.target.name === "all") {
       setSignUpCredentials({ ...e.target.value });
     } else if (e.target.name === "profile_image") {
-      setSignUpCredentials({ ...signUpCredentials, [e.target.name]: e.target.files[0] });
+      setSignUpCredentials({
+        ...signUpCredentials,
+        [e.target.name]: e.target.files[0],
+      });
     } else {
-      setSignUpCredentials({ ...signUpCredentials, [e.target.name]: e.target.value });
+      setSignUpCredentials({
+        ...signUpCredentials,
+        [e.target.name]: e.target.value,
+      });
     }
   };
 
   const handleSignInSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
     try {
-      const success = await login(signInCredentials);
-      if (success) {
-        console.log("Showing success toast for sign-in");
+      const result = await login(signInCredentials);
+
+      if (result.success) {
+        console.log("User after sign-in:", result.user); // ✅ has role immediately
         toast.success("Signed in successfully!", {
           position: "top-right",
           autoClose: 2000,
@@ -70,26 +77,22 @@ const AuthModal = ({ open, onClose }) => {
           draggable: true,
           toastId: "sign-in-success",
         });
-        setTimeout(onClose, 1000); // Delay closing to show toast
+
+        // Example: navigate based on role
+        if (result.user.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
       } else {
         const errorMessage = "Sign-in failed. Please check your credentials.";
         setError(errorMessage);
-        console.log("Showing error toast for sign-in");
-        toast.error(errorMessage, {
-          position: "top-right",
-          autoClose: 5000,
-          toastId: "sign-in-error",
-        });
+        toast.error(errorMessage, { position: "top-right", autoClose: 5000 });
       }
     } catch (err) {
       const errorMessage = err.message || "An error occurred during sign-in.";
       setError(errorMessage);
-      console.log("Showing error toast for sign-in", errorMessage);
-      toast.error(errorMessage, {
-        position: "top-right",
-        autoClose: 5000,
-        toastId: "sign-in-error",
-      });
+      toast.error(errorMessage, { position: "top-right", autoClose: 5000 });
     }
   };
 
@@ -117,7 +120,10 @@ const AuthModal = ({ open, onClose }) => {
       });
       setTimeout(onClose, 2000); // Delay closing to show toast
     } catch (err) {
-      const errorMessage = err.response?.data?.message || err.message || "An error occurred during sign-up.";
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "An error occurred during sign-up.";
       setError(errorMessage);
       console.log("Showing error toast for sign-up", errorMessage);
       toast.error(errorMessage, {
@@ -174,11 +180,7 @@ const AuthModal = ({ open, onClose }) => {
   if (!open) return null;
 
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      sx={{ backdropFilter: "blur(5px)" }}
-    >
+    <Modal open={open} onClose={onClose} sx={{ backdropFilter: "blur(5px)" }}>
       <Box sx={modalStyle}>
         <Box sx={contentStyle}>
           <Typography variant="h6" component="h2" gutterBottom align="center">

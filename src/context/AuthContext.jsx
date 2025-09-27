@@ -1,3 +1,5 @@
+// AuthContext.jsx
+
 import { createContext, useState, useContext } from "react";
 import { loginUser, signUpUser } from "../services/authService";
 import axios from "axios";
@@ -51,10 +53,10 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("token", token);
       localStorage.setItem("expiresAt", expiryTime.toString());
 
-      return true;
+      return { success: true, user, token }; // ✅ return data
     } catch (err) {
       setError(err.message || "Login failed");
-      return false;
+      return { success: false, error: err.message };
     } finally {
       setLoading(false);
     }

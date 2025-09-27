@@ -1,69 +1,39 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function Profile() {
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user') || '{}'));
+  const [user, setUser] = useState(
+    JSON.parse(localStorage.getItem("user") || "{}")
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  const [imageError, setImageError] = useState(null);
+  const [setImageError] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const fileInputRef = useRef(null);
+  const [selectedFile] = useState(null);
   const navigate = useNavigate();
-  const baseUrl = process.env.REACT_APP_BASE_URL || '';
+  const baseUrl = process.env.REACT_APP_BASE_URL || "";
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      navigate('/login');
+      navigate("/login");
     }
     // Set initial preview URL if user has a profile image
     if (user.profile_image) {
-       const path = process.env.REACT_APP_BASE_URL_IMG + user.profile_image;
+      const path = process.env.REACT_APP_BASE_URL_IMG + user.profile_image;
       setPreviewUrl(path);
     }
   }, [navigate, user.profile_image]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUser(prevUser => ({ ...prevUser, [name]: value }));
-    if (name === 'profile_image') {
+    setUser((prevUser) => ({ ...prevUser, [name]: value }));
+    if (name === "profile_image") {
       setImageError(null);
       setPreviewUrl(value);
     }
-  };
-
-  const handleFileSelect = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (!file.type.match('image.*')) {
-        setImageError('Please select an image file');
-        setSelectedFile(null);
-        setPreviewUrl(null);
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        setImageError('Image size should be less than 5MB');
-        setSelectedFile(null);
-        setPreviewUrl(null);
-        return;
-      }
-      setSelectedFile(file);
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-      setImageError(null);
-      setUser(prev => ({ ...prev, profile_image: '' })); // Clear URL input
-    }
-  };
-
-  const handleImagePicker = () => {
-    fileInputRef.current.click();
-  };
-
-  const handleImageError = () => {
-    setImageError('Invalid image URL');
   };
 
   const handleSubmit = (e) => {
@@ -75,37 +45,40 @@ function Profile() {
     const formData = new FormData();
     // Append all user fields except profile_image if a file is selected
     Object.entries(user).forEach(([key, value]) => {
-      if (key !== 'profile_image' || !selectedFile) {
+      if (key !== "profile_image" || !selectedFile) {
         formData.append(key, value);
       }
     });
     if (selectedFile) {
-      formData.append('profile_image', selectedFile);
+      formData.append("profile_image", selectedFile);
     }
 
     fetch(`${baseUrl}auth/update/${user.id}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: formData,
     })
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
           if (response.status === 404) {
-            throw new Error('User not found');
+            throw new Error("User not found");
           }
-          throw new Error('Failed to update user data');
+          throw new Error("Failed to update user data");
         }
         return response.json();
       })
-      .then(data => {
+      .then((data) => {
         // Update user with the new profile_image path from the server
-        const updatedUser = { ...user, profile_image: data.profile_image || user.profile_image };
+        const updatedUser = {
+          ...user,
+          profile_image: data.profile_image || user.profile_image,
+        };
         setUser(updatedUser);
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-        setSuccess('Profile updated successfully!');
-          toast.success("Profile updated successfully!", {
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        setSuccess("Profile updated successfully!");
+        toast.success("Profile updated successfully!", {
           position: "top-right",
           autoClose: 2000,
           hideProgressBar: false,
@@ -117,14 +90,16 @@ function Profile() {
         setTimeout(() => setSuccess(null), 3000);
         setLoading(false);
         if (selectedFile) {
-          setPreviewUrl(data.profile_image || URL.createObjectURL(selectedFile));
+          setPreviewUrl(
+            data.profile_image || URL.createObjectURL(selectedFile)
+          );
         }
       })
-      .catch(err => {
-        if (err.message.includes('401')) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          navigate('/login');
+      .catch((err) => {
+        if (err.message.includes("401")) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          navigate("/login");
         }
         setError(err.message);
         setTimeout(() => setError(null), 3000);
@@ -326,9 +301,11 @@ function Profile() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              {loading ? 'Saving...' : 'Save Changes'}
+              {loading ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </form>

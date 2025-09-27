@@ -1,32 +1,45 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-// import Login from "./pages/auth/Login";
-import Dashboard from "./pages/admin/Dashboard";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Home from "./pages/Home";
-import './App.css';
 import Profile from "./components/Profile";
-import Topbar from "./components/Topbar";
+import AdminPage from "./pages/admin/AdminPage";
+import MainLayout from "./components/MainLayout"; // ✅ new
+import "./App.css";
+
 const App = () => {
   return (
     <AuthProvider>
       <BrowserRouter>
-      <Topbar />
         <Routes>
-          <Route path="/" element={<Home />} />
+          {/* Routes with Topbar */}
           <Route
-            path="/dashboard"
+            path="/"
             element={
-              <ProtectedRoute
-                allowedRoles={["admin", "invigilator"]}
-              >
-                <Dashboard />
+              <MainLayout>
+                <Home />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <MainLayout>
+                <Profile />
+              </MainLayout>
+            }
+          />
+
+          {/* Admin route without Topbar */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminPage />
               </ProtectedRoute>
             }
           />
-          <Route path="/profile" element={<Profile />} />
         </Routes>
-
       </BrowserRouter>
     </AuthProvider>
   );
