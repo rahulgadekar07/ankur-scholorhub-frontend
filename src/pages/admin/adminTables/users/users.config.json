@@ -1,0 +1,13 @@
+{
+  "columns": [
+    { "key": "id", "label": "ID" },
+    { "key": "full_name", "label": "Full Name" },
+    { "key": "email", "label": "Email" },
+    { "key": "role", "label": "Role" },
+    { "key": "is_active", "label": "Active" }
+  ],
+  "actions": [
+    { "label": "Edit", "icon": "FiEdit" },
+    { "label": "Delete", "icon": "FiTrash2" }
+  ]
+}

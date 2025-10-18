@@ -50,7 +50,7 @@ const AdminHeader = () => {
    };
 
   return (
-    <div className="flex w-full bg-blue-700 text-white justify-between items-center p-4 relative">
+    <div className="p-2 min-h-full flex w-full bg-blue-700 text-white justify-between items-center relative">
       <h1 className="text-2xl font-bold">Admin Dashboard</h1>
       <div className="flex items-center relative" ref={dropdownRef}>
         <span>Welcome, {fullName}</span>

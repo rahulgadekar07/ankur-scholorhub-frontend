@@ -32,7 +32,7 @@ const App = () => {
 
           {/* Admin route without Topbar */}
           <Route
-            path="/admin"
+            path="/admin/*"
             element={
               <ProtectedRoute allowedRoles={["admin"]}>
                 <AdminPage />
