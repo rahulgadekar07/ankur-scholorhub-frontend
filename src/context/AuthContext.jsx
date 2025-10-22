@@ -3,6 +3,8 @@
 import { createContext, useState, useContext } from "react";
 import { loginUser, signUpUser } from "../services/authService";
 import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AuthContext = createContext();
 
@@ -53,10 +55,10 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("token", token);
       localStorage.setItem("expiresAt", expiryTime.toString());
 
-      return { success: true, user, token }; // ✅ return data
+      return { success: true, user, token };
     } catch (err) {
       setError(err.message || "Login failed");
-      return { success: false, error: err.message };
+      throw err; // ✅ Important — propagate to handleSignInSubmit
     } finally {
       setLoading(false);
     }
@@ -106,7 +108,15 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("user", JSON.stringify(response.data.user));
       }
     } catch (err) {
-      console.error("Failed to fetch user:", err);
+      if (err.response && err.response.status === 403) {
+        // use toast
+        toast.error(
+          err.response.data.message || "Your account is deactivated."
+        );
+        logout(); // optional: log them out automatically
+      } else {
+        console.error("Failed to fetch user:", err);
+      }
     }
   };
 

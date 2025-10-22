@@ -53,18 +53,26 @@ const CustomTable = ({
   }, [data, sortConfig, filterText]);
 
   // Pagination
-  const totalPages = Math.ceil(sortedData.length / pageSize);
-  const paginatedData = sortedData.slice(
-    (page - 1) * pageSize,
-    page * pageSize
+  const totalPages = useMemo(
+    () => Math.ceil(sortedData.length / pageSize),
+    [sortedData, pageSize]
   );
 
-  // Ensure page never exceeds totalPages
+  const paginatedData = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return sortedData.slice(startIndex, endIndex);
+  }, [sortedData, page, pageSize]);
+
   useEffect(() => {
-    if (page > totalPages) {
-      setPage(totalPages || 1);
-    }
+    if (page > totalPages) setPage(totalPages || 1);
   }, [page, totalPages]);
+
+  const handlePageSizeChange = (e) => {
+    const newSize = Number(e.target.value);
+    setPageSize(newSize);
+    setPage(1);
+  };
 
   const handleSort = (key) => {
     setSortConfig((prev) =>
@@ -72,12 +80,6 @@ const CustomTable = ({
         ? { key, direction: prev.direction === "asc" ? "desc" : "asc" }
         : { key, direction: "asc" }
     );
-  };
-
-  const handlePageSizeChange = (e) => {
-    console.log("event:", e.target.value);
-    setPageSize(Number(e.target.value));
-    setPage(1);
   };
 
   return (
@@ -130,10 +132,7 @@ const CustomTable = ({
                 className="hover:bg-gray-50 cursor-pointer"
               >
                 {columns.map((col) => (
-                  <td
-                    key={col.key}
-                    className="px-4 py-2 text-sm text-gray-800"
-                  >
+                  <td key={col.key} className="px-4 py-2 text-sm text-gray-800">
                     {col.render ? col.render(row[col.key], row) : row[col.key]}
                   </td>
                 ))}

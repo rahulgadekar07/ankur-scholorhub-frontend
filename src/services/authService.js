@@ -12,8 +12,9 @@ export const loginUser = async ({ email, password }) => {
     });
     return response.data; // Assumes response.data is { user, token }
   } catch (error) {
+    const message = error.response?.data?.message || error.message;
     console.error("Login error:", error.response?.data || error.message);
-    throw error; // Rethrow to handle in calling function
+    throw { status: error.response?.status, message };
   }
 };
 

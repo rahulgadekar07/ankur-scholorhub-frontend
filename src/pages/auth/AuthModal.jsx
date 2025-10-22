@@ -59,42 +59,41 @@ const AuthModal = ({ open, onClose }) => {
     }
   };
 
-  const handleSignInSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
+ const handleSignInSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
 
-    try {
-      const result = await login(signInCredentials);
+  try {
+    const result = await login(signInCredentials);
 
-      if (result.success) {
-        console.log("User after sign-in:", result.user); // ✅ has role immediately
-        toast.success("Signed in successfully!", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          toastId: "sign-in-success",
-        });
-
-        // Example: navigate based on role
-        if (result.user.role === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/");
-        }
-      } else {
-        const errorMessage = "Sign-in failed. Please check your credentials.";
-        setError(errorMessage);
-        toast.error(errorMessage, { position: "top-right", autoClose: 5000 });
-      }
-    } catch (err) {
-      const errorMessage = err.message || "An error occurred during sign-in.";
+    if (result.success) {
+      toast.success("Signed in successfully!");
+      if (result.user.role === "admin") navigate("/admin");
+      else navigate("/");
+    } else {
+      const errorMessage = "Sign-in failed. Please check your credentials.";
       setError(errorMessage);
-      toast.error(errorMessage, { position: "top-right", autoClose: 5000 });
+      toast.error(errorMessage);
     }
-  };
+  } catch (err) {
+    // ✅ Handle blocked user here
+    console.log("Error:",err);
+    
+    if (err.status === 403) {
+      toast.error("Your account has been blocked. Please contact support.", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+    } else if (err.status === 404) {
+      toast.error("User not found.");
+    } else {
+      toast.error(err.message || "An error occurred during sign-in.");
+    }
+
+    setError(err.message || "An error occurred during sign-in.");
+  }
+};
+
 
   const handleSignUpSubmit = async (e) => {
     e.preventDefault();
