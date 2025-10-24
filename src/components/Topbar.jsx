@@ -104,7 +104,8 @@ const Topbar = () => {
   }, []);
 
   return (
-    <div className="max-h-30vh">
+    <div className="w-full bg-white shadow-sm">
+      {" "}
       {/* Top Section */}
       <div className="flex justify-between w-full bg-blue-800 text-white p-1 text-sm">
         <p>
@@ -164,9 +165,8 @@ const Topbar = () => {
           )}
         </div>
       </div>
-
       {/* Middle Section */}
-      <div className="flex flex-row justify-between content-center">
+      <div className="flex flex-row justify-between items-center flex-grow bg-sky-100">
         <div>
           <img className="w-20 h-20 mt-2" src="/Logo.png" alt="Logo" />
         </div>
@@ -188,7 +188,6 @@ const Topbar = () => {
           <img className="w-20 h-20 mt-2" src="/Logo.png" alt="Logo" />
         </div>
       </div>
-
       {/* Bottom Section */}
       <div className="w-full bg-blue-800 text-white p-1 text-sm">
         <p>
@@ -196,7 +195,6 @@ const Topbar = () => {
           gadekarrahul804@gmail.com
         </p>
       </div>
-
       {/* Profile Picture Modal */}
       {profileModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
@@ -233,7 +231,6 @@ const Topbar = () => {
           </div>
         </div>
       )}
-
       {/* Auth Modal */}
       <AuthModal open={modalOpen} onClose={handleClose} />
       <ToastContainer style={{ zIndex: 9999 }} />
