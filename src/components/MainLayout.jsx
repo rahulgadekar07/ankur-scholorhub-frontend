@@ -1,18 +1,23 @@
 // src/layouts/MainLayout.jsx
 import Topbar from "../components/Topbar";
+import Footer from "./Footer";
 
+// src/layouts/MainLayout.jsx
 const MainLayout = ({ children }) => {
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Topbar – shrink-to-fit */}
+    <div className="flex flex-col h-screen">
       <header className="flex-shrink-0">
         <Topbar />
       </header>
 
-      {/* MAIN CONTENT – **must** fill the rest */}
-      <main className="flex-1 bg-gray-50">
+      {/* SCROLL CONTAINER – HIDDEN SCROLLBAR */}
+      <main className="flex-1 overflow-y-auto scrollbar-thin">
         {children}
       </main>
+
+      <footer className="flex-shrink-0">
+        <Footer />
+      </footer>
     </div>
   );
 };

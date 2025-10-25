@@ -1,7 +1,7 @@
 body {
-    background: linear-gradient(to bottom, #e0f2fe 0%, #f0f9ff 50%, #d1e4fb 100%);
-    background-attachment: fixed;
-    min-height: 100vh;
+  background: linear-gradient(to bottom, #e0f2fe 0%, #f0f9ff 50%, #d1e4fb 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
 }
 
 @keyframes fadeIn {
@@ -9,6 +9,7 @@ body {
     opacity: 0;
     transform: translateY(20px) scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -16,19 +17,46 @@ body {
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.03); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.03);
+  }
 }
 
 .animate-\[fadeIn_0\.6s_ease-out_0s_forwards\] {
   animation: fadeIn 0.6s ease-out 0s forwards;
 }
+
 .animate-\[fadeIn_0\.6s_ease-out_0\.2s_forwards\] {
   animation: fadeIn 0.6s ease-out 0.2s forwards;
 }
+
 .animate-\[fadeIn_0\.6s_ease-out_0\.4s_forwards\] {
   animation: fadeIn 0.6s ease-out 0.4s forwards;
 }
+
 .animate-\[pulse_2s_infinite\] {
   animation: pulse 2s infinite;
+}
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #a0aec0 transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: #a0aec0;
+  border-radius: 3px;
 }

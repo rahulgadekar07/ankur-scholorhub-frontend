@@ -1,182 +1,217 @@
 // src/pages/Home.jsx
-import React from "react";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  MapPin,
+  Users,
+  GraduationCap,
+  IndianRupee,
+  Bell,
+  ChevronDown,
+  Heart,
+  ArrowRight,
+  Quote,
+  Star,
+} from "lucide-react";
 
 const Home = () => {
-  // ------------------- Enhanced CountUp Hook -------------------
-  const useCountUp = (end, duration = 2200, delay = 0, prefix = "", suffix = "") => {
+  // ── MOCK NOTICES (shrinkable) ─────────────────────────────────────
+  const [notices, setNotices] = useState([
+    { id: 1, title: "Notice 1", desc: "Scholarship deadline: Nov 15", date: "2025-10-20" },
+    { id: 2, title: "Notice 2", desc: "AGM on Dec 5", date: "2025-10-18" },
+    { id: 3, title: "Notice 3", desc: "New donor portal live", date: "2025-10-15" },
+  ]);
+
+  // Uncomment for real API
+  /*
+  useEffect(() => {
+    fetch("/api/notices").then(r => r.json()).then(setNotices);
+  }, []);
+  */
+
+  // ── Count-Up Hook (same as before) ───────────────────────────────
+  const useCountUp = (end, duration = 1800, delay = 0) => {
     const [count, setCount] = useState(0);
-    const [displayValue, setDisplayValue] = useState(prefix + "0" + suffix);
-    const countRef = useRef(null);
-    const frameRef = useRef(null);
-    const startTimeRef = useRef(null);
-    const hasStartedRef = useRef(false);
+    const ref = useRef(null);
+    const frame = useRef();
+    const start = useRef();
 
     const easeOutQuart = (t) => 1 - Math.pow(1 - t, 4);
 
-    const animate = (timestamp) => {
-      if (!startTimeRef.current) startTimeRef.current = timestamp;
-      const elapsed = timestamp - startTimeRef.current;
-
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = easeOutQuart(progress);
-      const current = Math.floor(eased * end);
-
-      setCount(current);
-      setDisplayValue(prefix + formatNumber(current) + suffix);
-
-      if (progress < 1) {
-        frameRef.current = requestAnimationFrame(animate);
-      } else {
-        setDisplayValue(prefix + formatNumber(end) + suffix);
-      }
+    const step = (ts) => {
+      if (!start.current) start.current = ts;
+      const elapsed = ts - start.current;
+      const prog = Math.min(elapsed / duration, 1);
+      setCount(Math.floor(easeOutQuart(prog) * end));
+      if (prog < 1) frame.current = requestAnimationFrame(step);
     };
 
     useEffect(() => {
-      const startAnimation = () => {
-        if (hasStartedRef.current) return;
-        hasStartedRef.current = true;
-
-        setTimeout(() => {
-          startTimeRef.current = null;
-          frameRef.current = requestAnimationFrame(animate);
-        }, delay);
-      };
-
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            startAnimation();
-            observer.disconnect();
+      const obs = new IntersectionObserver(
+        ([e]) => {
+          if (e.isIntersecting) {
+            setTimeout(() => {
+              start.current = undefined;
+              frame.current = requestAnimationFrame(step);
+            }, delay);
+            obs.disconnect();
           }
         },
-        { threshold: 0.6, rootMargin: "0px 0px -50px 0px" }
+        { threshold: 0.6 }
       );
-
-      if (countRef.current) {
-        observer.observe(countRef.current);
-      }
-
+      if (ref.current) obs.observe(ref.current);
       return () => {
-        observer.disconnect();
-        if (frameRef.current) cancelAnimationFrame(frameRef.current);
+        obs.disconnect();
+        if (frame.current) cancelAnimationFrame(frame.current);
       };
-    }, [end, duration, delay, prefix, suffix]);
+    }, [end, duration, delay]);
 
-    const ref = (node) => {
-      countRef.current = node;
-    };
-
-    return { displayValue, ref };
+    return { count, ref };
   };
 
-  // ------------------- Formatter -------------------
-  const formatNumber = (n) => new Intl.NumberFormat("en-IN").format(n);
-
-  // ------------------- Counters with Staggered Delays -------------------
-  const donors = useCountUp(120, 2000, 0, "", "+");
-  const students = useCountUp(850, 2200, 200, "", "+");
-  const turnover = useCountUp(4_500_000, 2500, 400, "₹", "");
+  const fmt = (n) => new Intl.NumberFormat("en-IN").format(n);
+  const donors = useCountUp(120, 1800, 0);
+  const students = useCountUp(850, 2000, 150);
+  const turnover = useCountUp(4_500_000, 2200, 300);
 
   return (
-    <div className="flex h-[15vh] items-center justify-between bg-gradient-to-br from-sky-50 to-sky-100 overflow-hidden">
-      {/* ---------- MAP ---------- */}
-      <div className="w-1/2 h-full overflow-hidden rounded-l-lg shadow-xl">
-        <iframe
-          title="Ankur Vidyarthi Foundation Location"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3174.5740442791234!2d74.25575317421406!3d17.57679259732301!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc3d376539e24bd%3A0x306c8c15870b80f4!2z4KSF4KSC4KSV4KWB4KSwIOCkteCkv-CkpuCljeCkr-CkvuCksOCljeCkpeClgCDgpKvgpL7gpIngpILgpKHgpYfgpLbgpKggKOCkheCkreCljeCkr-CkvuCkuOCkv-CkleCkviksIOCkteClh-Cks-Clgg!5e1!3m2!1sen!2sin!4v1761282395843!5m2!1sen!2sin"
-          width="100%"
-          height="100%"
-          style={{ border: 0 }}
-          allowFullScreen=""
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          className="rounded-l-lg scale-105 transition-transform duration-1000 hover:scale-110"
-        />
+    <div className="space-y-6 pb-8">
+      {/* ── COMPACT HERO STRIP: MAP + COUNTERS ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-48 lg:h-40">
+        {/* MAP */}
+        <div className="relative overflow-hidden rounded-xl shadow-md border border-gray-300">
+          <iframe
+            title="Ankur Vidyarthi Foundation"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3174.5740442791234!2d74.25575317421406!3d17.57679259732301!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc3d376539e24bd%3A0x306c8c15870b80f4!2z4KSF4KSC4KSV4KWB4KSwIOCkteCkv-CkpuCljeCkr-CkvuCksOCljeCkpeClgCDgpKvgpL7gpIngpILgpKHgpYfgpLbgpKggKOCkheCkreCljeCkr-CkvuCkuOCkv-CkleCkviksIOCkteClh-Cks-Clgg!5e1!3m2!1sen!2sin!4v1761282395843!5m2!1sen!2sin"
+            width="100%"
+            height="100%"
+            className="rounded-xl"
+            style={{ border: 0 }}
+            allowFullScreen=""
+            loading="lazy"
+          />
+          <div className="absolute top-2 left-2 bg-white px-2 py-1 rounded-full shadow text-xs font-medium flex items-center gap-1">
+            <MapPin className="w-3 h-3 text-red-600" />
+            View Map
+          </div>
+        </div>
+
+        {/* COUNTERS */}
+        <div className="grid grid-cols-3 gap-3 bg-white rounded-xl shadow-md p-4 border border-gray-300">
+          <CounterCard ref={donors.ref} icon={<Users className="w-7 h-7" />} value={`${fmt(donors.count)}+`} label="Donors" gradient="from-indigo-500 to-indigo-700" textColor="text-indigo-600" />
+          <CounterCard ref={students.ref} icon={<GraduationCap className="w-7 h-7" />} value={`${fmt(students.count)}+`} label="Students" gradient="from-green-500 to-green-700" textColor="text-green-600" />
+          <CounterCard ref={turnover.ref} icon={<IndianRupee className="w-7 h-7" />} value={`₹${fmt(turnover.count)}`} label="Turnover" gradient="from-amber-500 to-amber-700" textColor="text-amber-600" />
+        </div>
       </div>
 
-      {/* ---------- COUNTERS ---------- */}
-      <div className="flex w-1/2 h-full bg-white rounded-r-lg shadow-xl overflow-hidden">
-        {/* Donor */}
-        <CounterItem
-          ref={donors.ref}
-          value={donors.displayValue}
-          label="Donors"
-          color="indigo"
-          delay="animate-[fadeIn_0.6s_ease-out_0s_forwards]"
-        />
+      {/* ── MAIN CONTENT: LEFT (Small Notices) | RIGHT (Testimonials + CTA) ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* LEFT: SHRINKED NOTICEBOARD */}
+        <div className="lg:col-span-1">
+          <div className="bg-white rounded-xl shadow-md border border-gray-300 overflow-hidden h-full flex flex-col">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-3 flex items-center justify-between text-sm">
+              <h3 className="font-bold flex items-center gap-1">
+                <Bell className="w-5 h-5" />
+                Notices
+              </h3>
+              <ChevronDown className="w-4 h-4 animate-bounce" />
+            </div>
+            <div className="flex-1 overflow-y-auto scrollbar-thin text-xs">
+              {notices.length === 0 ? (
+                <p className="text-center text-gray-400 py-6">No notices</p>
+              ) : (
+                <div className="divide-y divide-gray-200">
+                  {notices.map((n) => (
+                    <div key={n.id} className="p-3 hover:bg-gray-50 cursor-pointer">
+                      <h4 className="font-medium text-gray-800">{n.title}</h4>
+                      <p className="text-gray-600 text-xs mt-1">{n.desc}</p>
+                      <span className="text-xs text-gray-400">
+                        {new Date(n.date).toLocaleDateString("en-IN")}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="p-2 text-center border-t">
+              <button className="text-blue-600 text-xs hover:underline">View All</button>
+            </div>
+          </div>
+        </div>
 
-        {/* Students */}
-        <CounterItem
-          ref={students.ref}
-          value={students.displayValue}
-          label="Students"
-          color="green"
-          delay="animate-[fadeIn_0.6s_ease-out_0.2s_forwards]"
-        />
+        {/* RIGHT: MAIN CONTENT – TESTIMONIALS + CTA */}
+        <div className="lg:col-span-3 space-y-6">
+          {/* Testimonial 1 */}
+          <TestimonialCard
+            quote="Ankur Vidyarthi gave me wings. From a small village to IIT — all because of their support."
+            author="Priya M."
+            role="IIT Bombay, 2025"
+            rating={5}
+          />
 
-        {/* Market Turnover */}
-        <CounterItem
-          ref={turnover.ref}
-          value={turnover.displayValue}
-          label="Market Turnover"
-          color="amber"
-          delay="animate-[fadeIn_0.6s_ease-out_0.4s_forwards]"
-        />
+          {/* Testimonial 2 */}
+          <TestimonialCard
+            quote="I donated once. Now I see my money turning into futures. This is real impact."
+            author="Sanjay K."
+            role="Donor since 2022"
+            rating={5}
+          />
+
+          {/* Testimonial 3 */}
+          <TestimonialCard
+            quote="Transparent, accountable, and life-changing. Proud to be part of this family."
+            author="Asha R."
+            role="Volunteer"
+            rating={5}
+          />
+
+          {/* CTA Buttons */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 hover:shadow-xl transition shadow-lg">
+              <Heart className="w-6 h-6" />
+              Donate Now
+            </button>
+            <button className="bg-gradient-to-r from-green-600 to-green-800 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 hover:shadow-xl transition shadow-lg">
+              Get Started
+              <ArrowRight className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-// ------------------- Reusable Counter Item Component -------------------
-const CounterItem = React.forwardRef(({ value, label, color, delay }, ref) => {
-  const colorClasses = {
-    indigo: "text-indigo-600 from-indigo-500 to-indigo-700",
-    green: "text-green-600 from-green-500 to-green-700",
-    amber: "text-amber-600 from-amber-500 to-amber-700",
-  };
-
-  return (
-    <div
-      ref={ref}
-      className={`flex flex-col items-center justify-center w-1/3 border-r border-gray-200 last:border-r-0 opacity-0 ${delay}`}
-      style={{ animationFillMode: "forwards" }}
-    >
-      <div className="relative">
-        <span
-          className={`text-4xl font-extrabold bg-gradient-to-r ${colorClasses[color]} bg-clip-text text-transparent 
-            drop-shadow-sm animate-[pulse_2s_infinite] tracking-tight`}
-          style={{
-            textShadow: "0 2px 4px rgba(0,0,0,0.1)",
-          }}
-        >
-          {value}
-        </span>
-      </div>
-      <span className="mt-2 text-sm font-semibold text-gray-700 tracking-wide">
-        {label}
-      </span>
+/* ── Reusable Components ── */
+const CounterCard = React.forwardRef(({ icon, value, label, gradient, textColor }, ref) => (
+  <div
+    ref={ref}
+    className="flex flex-col items-center justify-center text-center opacity-0 animate-[fadeIn_0.6s_ease-out_0s_forwards]"
+    style={{ animationDelay: "0.1s", animationFillMode: "forwards" }}
+  >
+    <div className={`p-2.5 rounded-full bg-gradient-to-br ${gradient} text-white shadow animate-[pulse_2s_infinite]`}>
+      {icon}
     </div>
-  );
-});
+    <p className={`mt-2 text-xl font-bold ${textColor}`}>{value}</p>
+    <p className="text-xs text-gray-600 mt-1">{label}</p>
+  </div>
+));
 
-// ------------------- Tailwind Animations (Add to globals.css) -------------------
-/*
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.03); }
-}
-*/
+const TestimonialCard = ({ quote, author, role, rating }) => (
+  <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-6 rounded-xl shadow-md border border-blue-100">
+    <Quote className="w-8 h-8 text-blue-600 mb-3" />
+    <p className="text-gray-700 italic leading-relaxed mb-4">"{quote}"</p>
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="font-bold text-blue-900">{author}</p>
+        <p className="text-sm text-gray-600">{role}</p>
+      </div>
+      <div className="flex gap-1">
+        {[...Array(rating)].map((_, i) => (
+          <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+        ))}
+      </div>
+    </div>
+  </div>
+);
 
 export default Home;

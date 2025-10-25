@@ -1,0 +1,25 @@
+// ── Select ───────────────────────────────────────────────────────
+const Select = ({ label, icon, children, ...props }) => (
+  <div className="flex flex-col">
+    <label className="block text-gray-700 font-medium mb-1">{label}</label>
+    <div className="relative">
+      {icon && (
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+          {icon}
+        </span>
+      )}
+      <select
+        className={`w-full p-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white ${
+          icon ? "pl-10" : ""
+        }`}
+        {...props}
+      >
+        {children}
+      </select>
+      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+        Down Arrow
+      </span>
+    </div>
+  </div>
+);
+export default Select;
