@@ -3,7 +3,7 @@ import CustomTable from "../../components/CustomTable";
 import AdminHeader from "./AdminHeader";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import AdminSideBar from "./AdminSideBar";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import UsersTable from "./adminTables/users/UsersTable";
 
 const AdminPage = () => {

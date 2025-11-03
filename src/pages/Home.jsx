@@ -7,22 +7,30 @@ import {
   IndianRupee,
   Bell,
   ChevronDown,
-  Heart,
-  ArrowRight,
-  Quote,
-  Star,
 } from "lucide-react";
-
+import { Routes, Route } from "react-router-dom";
+import MainContent from "../components/MainContent";
+import Donate from "./Donate";
 const Home = () => {
   // ── MOCK NOTICES (shrinkable) ─────────────────────────────────────
   const [notices, setNotices] = useState([
-    { id: 1, title: "Notice 1", desc: "Scholarship deadline: Nov 15", date: "2025-10-20" },
+    {
+      id: 1,
+      title: "Notice 1",
+      desc: "Scholarship deadline: Nov 15",
+      date: "2025-10-20",
+    },
     { id: 2, title: "Notice 2", desc: "AGM on Dec 5", date: "2025-10-18" },
-    { id: 3, title: "Notice 3", desc: "New donor portal live", date: "2025-10-15" },
+    {
+      id: 3,
+      title: "Notice 3",
+      desc: "New donor portal live",
+      date: "2025-10-15",
+    },
   ]);
 
   // Uncomment for real API
-  /*
+  /* 
   useEffect(() => {
     fetch("/api/notices").then(r => r.json()).then(setNotices);
   }, []);
@@ -97,9 +105,30 @@ const Home = () => {
 
         {/* COUNTERS */}
         <div className="grid grid-cols-3 gap-3 bg-white rounded-xl shadow-md p-4 border border-gray-300">
-          <CounterCard ref={donors.ref} icon={<Users className="w-7 h-7" />} value={`${fmt(donors.count)}+`} label="Donors" gradient="from-indigo-500 to-indigo-700" textColor="text-indigo-600" />
-          <CounterCard ref={students.ref} icon={<GraduationCap className="w-7 h-7" />} value={`${fmt(students.count)}+`} label="Students" gradient="from-green-500 to-green-700" textColor="text-green-600" />
-          <CounterCard ref={turnover.ref} icon={<IndianRupee className="w-7 h-7" />} value={`₹${fmt(turnover.count)}`} label="Turnover" gradient="from-amber-500 to-amber-700" textColor="text-amber-600" />
+          <CounterCard
+            ref={donors.ref}
+            icon={<Users className="w-7 h-7" />}
+            value={`${fmt(donors.count)}+`}
+            label="Donors"
+            gradient="from-indigo-500 to-indigo-700"
+            textColor="text-indigo-600"
+          />
+          <CounterCard
+            ref={students.ref}
+            icon={<GraduationCap className="w-7 h-7" />}
+            value={`${fmt(students.count)}+`}
+            label="Students"
+            gradient="from-green-500 to-green-700"
+            textColor="text-green-600"
+          />
+          <CounterCard
+            ref={turnover.ref}
+            icon={<IndianRupee className="w-7 h-7" />}
+            value={`₹${fmt(turnover.count)}`}
+            label="Turnover"
+            gradient="from-amber-500 to-amber-700"
+            textColor="text-amber-600"
+          />
         </div>
       </div>
 
@@ -121,7 +150,10 @@ const Home = () => {
               ) : (
                 <div className="divide-y divide-gray-200">
                   {notices.map((n) => (
-                    <div key={n.id} className="p-3 hover:bg-gray-50 cursor-pointer">
+                    <div
+                      key={n.id}
+                      className="p-3 hover:bg-gray-50 cursor-pointer"
+                    >
                       <h4 className="font-medium text-gray-800">{n.title}</h4>
                       <p className="text-gray-600 text-xs mt-1">{n.desc}</p>
                       <span className="text-xs text-gray-400">
@@ -133,85 +165,40 @@ const Home = () => {
               )}
             </div>
             <div className="p-2 text-center border-t">
-              <button className="text-blue-600 text-xs hover:underline">View All</button>
+              <button className="text-blue-600 text-xs hover:underline">
+                View All
+              </button>
             </div>
           </div>
         </div>
 
         {/* RIGHT: MAIN CONTENT – TESTIMONIALS + CTA */}
-        <div className="lg:col-span-3 space-y-6">
-          {/* Testimonial 1 */}
-          <TestimonialCard
-            quote="Ankur Vidyarthi gave me wings. From a small village to IIT — all because of their support."
-            author="Priya M."
-            role="IIT Bombay, 2025"
-            rating={5}
-          />
-
-          {/* Testimonial 2 */}
-          <TestimonialCard
-            quote="I donated once. Now I see my money turning into futures. This is real impact."
-            author="Sanjay K."
-            role="Donor since 2022"
-            rating={5}
-          />
-
-          {/* Testimonial 3 */}
-          <TestimonialCard
-            quote="Transparent, accountable, and life-changing. Proud to be part of this family."
-            author="Asha R."
-            role="Volunteer"
-            rating={5}
-          />
-
-          {/* CTA Buttons */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <button className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 hover:shadow-xl transition shadow-lg">
-              <Heart className="w-6 h-6" />
-              Donate Now
-            </button>
-            <button className="bg-gradient-to-r from-green-600 to-green-800 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 hover:shadow-xl transition shadow-lg">
-              Get Started
-              <ArrowRight className="w-6 h-6" />
-            </button>
-          </div>
-        </div>
+        <Routes>
+          <Route path="*" element={<MainContent />} />
+          <Route path="/donate" element={<Donate />} />
+        </Routes>
       </div>
     </div>
   );
 };
 
 /* ── Reusable Components ── */
-const CounterCard = React.forwardRef(({ icon, value, label, gradient, textColor }, ref) => (
-  <div
-    ref={ref}
-    className="flex flex-col items-center justify-center text-center opacity-0 animate-[fadeIn_0.6s_ease-out_0s_forwards]"
-    style={{ animationDelay: "0.1s", animationFillMode: "forwards" }}
-  >
-    <div className={`p-2.5 rounded-full bg-gradient-to-br ${gradient} text-white shadow animate-[pulse_2s_infinite]`}>
-      {icon}
-    </div>
-    <p className={`mt-2 text-xl font-bold ${textColor}`}>{value}</p>
-    <p className="text-xs text-gray-600 mt-1">{label}</p>
-  </div>
-));
-
-const TestimonialCard = ({ quote, author, role, rating }) => (
-  <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-6 rounded-xl shadow-md border border-blue-100">
-    <Quote className="w-8 h-8 text-blue-600 mb-3" />
-    <p className="text-gray-700 italic leading-relaxed mb-4">"{quote}"</p>
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="font-bold text-blue-900">{author}</p>
-        <p className="text-sm text-gray-600">{role}</p>
+const CounterCard = React.forwardRef(
+  ({ icon, value, label, gradient, textColor }, ref) => (
+    <div
+      ref={ref}
+      className="flex flex-col items-center justify-center text-center opacity-0 animate-[fadeIn_0.6s_ease-out_0s_forwards]"
+      style={{ animationDelay: "0.1s", animationFillMode: "forwards" }}
+    >
+      <div
+        className={`p-2.5 rounded-full bg-gradient-to-br ${gradient} text-white shadow animate-[pulse_2s_infinite]`}
+      >
+        {icon}
       </div>
-      <div className="flex gap-1">
-        {[...Array(rating)].map((_, i) => (
-          <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-        ))}
-      </div>
+      <p className={`mt-2 text-xl font-bold ${textColor}`}>{value}</p>
+      <p className="text-xs text-gray-600 mt-1">{label}</p>
     </div>
-  </div>
+  )
 );
 
 export default Home;
