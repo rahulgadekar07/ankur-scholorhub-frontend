@@ -9,6 +9,8 @@ import Donate from "./pages/Donate";
 import { ConfettiProvider, useConfetti } from "./context/ConfettiContext";
 import Confetti from "react-confetti";
 import "./App.css";
+import Contact from "./pages/Contact";
+import About from "./pages/About";
 
 // Optional: separate component to handle global confetti rendering
 function ConfettiWrapper() {
@@ -45,6 +47,22 @@ const App = () => {
               element={
                 <MainLayout>
                   <Donate />
+                </MainLayout>
+              }
+            />
+            <Route
+              path="/contact"
+              element={
+                <MainLayout>
+                  <Contact />
+                </MainLayout>
+              }
+            />
+            <Route
+              path="/about"
+              element={
+                <MainLayout>
+                  <About />
                 </MainLayout>
               }
             />

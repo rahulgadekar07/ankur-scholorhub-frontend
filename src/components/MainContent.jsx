@@ -2,7 +2,7 @@ import React from "react";
 import { Heart, ArrowRight, Quote, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 const MainContent = () => {
-    const Navigate = useNavigate();
+  const Navigate = useNavigate();
   const handleDonateClick = () => {
     Navigate("/donate");
     // alert(
@@ -13,6 +13,26 @@ const MainContent = () => {
 
   return (
     <div className="lg:col-span-3 space-y-6">
+      {/* CTA Buttons */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <button
+          className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 hover:shadow-xl transition shadow-lg"
+          onClick={handleDonateClick}
+        >
+          <Heart className="w-6 h-6" />
+          Donate Now
+        </button>
+        <button className="bg-gradient-to-r from-green-600 to-green-800 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 hover:shadow-xl transition shadow-lg">
+          Get Started
+          <ArrowRight className="w-6 h-6" />
+        </button>
+      </div>
+      {/* Testimonial heading */}
+      <div>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">
+          What Our Supporters Say:
+        </h2>
+        </div>
       {/* Testimonial 1 */}
       <TestimonialCard
         quote="Ankur Vidyarthi gave me wings. From a small village to IIT — all because of their support."
@@ -36,21 +56,6 @@ const MainContent = () => {
         role="Volunteer"
         rating={5}
       />
-
-      {/* CTA Buttons */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <button
-          className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 hover:shadow-xl transition shadow-lg"
-          onClick={handleDonateClick}
-        >
-          <Heart className="w-6 h-6" />
-          Donate Now
-        </button>
-        <button className="bg-gradient-to-r from-green-600 to-green-800 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 hover:shadow-xl transition shadow-lg">
-          Get Started
-          <ArrowRight className="w-6 h-6" />
-        </button>
-      </div>
     </div>
   );
 };

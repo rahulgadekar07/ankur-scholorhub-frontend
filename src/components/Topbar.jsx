@@ -188,12 +188,37 @@ const Topbar = () => {
           <img className="w-20 h-20 mt-2" src="/Logo.png" alt="Logo" />
         </div>
       </div>
-      {/* Bottom Section */}
-      <div className="w-full bg-blue-800 text-white p-1 text-sm">
-        <p>
-          <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
-          gadekarrahul804@gmail.com
-        </p>
+      {/* Bottom Section - Navigation Menu */}
+      <div className="w-full bg-blue-800 text-white p-2 text-sm">
+        <div className="flex justify-center items-center space-x-8">
+          <button
+            onClick={() => navigate("/")}
+            className="hover:text-yellow-300 transition duration-200"
+          >
+            Home
+          </button>
+
+          <button
+            onClick={() => navigate("/about")}
+            className="hover:text-yellow-300 transition duration-200"
+          >
+            About
+          </button>
+
+          <button
+            onClick={() => navigate("/contact")}
+            className="hover:text-yellow-300 transition duration-200"
+          >
+            Contact
+          </button>
+
+          <button
+            onClick={() => navigate("/donate")}
+            className="hover:text-yellow-300 transition duration-200"
+          >
+            Donate
+          </button>
+        </div>
       </div>
       {/* Profile Picture Modal */}
       {profileModalOpen && (

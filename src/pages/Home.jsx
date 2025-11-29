@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // src/pages/Home.jsx
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -13,7 +14,7 @@ import MainContent from "../components/MainContent";
 import Donate from "./Donate";
 const Home = () => {
   // ── MOCK NOTICES (shrinkable) ─────────────────────────────────────
-  const [notices, setNotices] = useState([
+  const [notices] = useState([
     {
       id: 1,
       title: "Notice 1",
@@ -82,7 +83,7 @@ const Home = () => {
   const turnover = useCountUp(4_500_000, 2200, 300);
 
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-6 pb-8 m-2">
       {/* ── COMPACT HERO STRIP: MAP + COUNTERS ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-48 lg:h-40">
         {/* MAP */}
@@ -133,7 +134,7 @@ const Home = () => {
       </div>
 
       {/* ── MAIN CONTENT: LEFT (Small Notices) | RIGHT (Testimonials + CTA) ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-2">
         {/* LEFT: SHRINKED NOTICEBOARD */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-xl shadow-md border border-gray-300 overflow-hidden h-full flex flex-col">
